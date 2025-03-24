@@ -12,12 +12,14 @@ class DataLoaderECHR:
         df_test = self._concatenate_files_in_df(json_files_test)
         df_val = self._concatenate_files_in_df(json_files_dev)
         
-        df_train = self._add_binary_violation(df_train)
-        df_test = self._add_binary_violation(df_test)
-        df_val = self._add_binary_violation(df_val)
-        df_train_dev = pd.concat([df_train,df_val], ignore_index=True)
-        
-        return {'train':df_train, 'test': df_test, 'val': df_val, 'test_dev': df_train_dev}
+        self.df_train = self._add_binary_violation(df_train)
+        self.df_test = self._add_binary_violation(df_test)
+        self.df_val = self._add_binary_violation(df_val)
+        self.df_train_dev = pd.concat([df_train,df_val], ignore_index=True)
+
+    def load_data(self):
+    
+        return {'train':self.df_train, 'test': self.df_test, 'dev': self.df_val, 'train_dev': self.df_train_dev}
 
 
     def _concatenate_files_in_df(self, json_files)->pd.DataFrame:
@@ -40,7 +42,7 @@ class DataLoaderECHR:
         ]
 
         # Create the new binary column
-        df['binary violates'] = df[columns_to_check].apply(
+        df['VIOLATED'] = df[columns_to_check].apply(
             lambda row: 1 if any(len(item) > 0 for item in row) else 0,
             axis=1
         )
